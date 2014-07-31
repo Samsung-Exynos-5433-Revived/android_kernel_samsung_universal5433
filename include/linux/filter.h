@@ -372,7 +372,7 @@ static inline unsigned int sk_filter_size(unsigned int proglen)
 int sk_attach_filter(struct sock_fprog *fprog, struct sock *sk);
 int sk_detach_filter(struct sock *sk);
 
-int sk_chk_filter(const struct sock_filter *filter, unsigned int flen);
+int bpf_check_classic(const struct sock_filter *filter, unsigned int flen);
 int sk_get_filter(struct sock *sk, struct sock_filter __user *filter,
 		  unsigned int len);
 
