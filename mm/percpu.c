@@ -782,8 +782,30 @@ restart:
 
 	chunk = pcpu_create_chunk();
 	if (!chunk) {
+		mutex_unlock(&pcpu_alloc_mutex);
 		err = "failed to allocate new chunk";
 		goto fail_unlock_mutex;
+
+	/*
+	 * No space left.  Create a new chunk.  We don't want multiple
+	 * tasks to create chunks simultaneously.  Serialize and create iff
+	 * there's still no empty chunk after grabbing the mutex.
+	 */
+	if (is_atomic)
+		goto fail;
+
+	if (list_empty(&pcpu_slot[pcpu_nr_slots - 1])) {
+		chunk = pcpu_create_chunk();
+		if (!chunk) {
+			mutex_unlock(&pcpu_alloc_mutex);
+			err = "failed to allocate new chunk";
+			goto fail;
+		}
+
+		spin_lock_irqsave(&pcpu_lock, flags);
+		pcpu_chunk_relocate(chunk, -1);
+	} else {
+		spin_lock_irqsave(&pcpu_lock, flags);
 	}
 
 	spin_lock_irqsave(&pcpu_lock, flags);
