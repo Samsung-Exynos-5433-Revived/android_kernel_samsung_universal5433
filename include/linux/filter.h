@@ -395,6 +395,7 @@ static inline unsigned int sk_filter_size(unsigned int proglen)
 }
 
 int sk_attach_filter(struct sock_fprog *fprog, struct sock *sk);
+int sk_attach_bpf(u32 ufd, struct sock *sk);
 int sk_detach_filter(struct sock *sk);
 
 int bpf_check_classic(const struct sock_filter *filter, unsigned int flen);
