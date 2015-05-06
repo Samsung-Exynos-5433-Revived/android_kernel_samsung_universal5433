@@ -382,7 +382,12 @@ static inline void bpf_prog_unlock_free(struct bpf_prog *fp)
 	__bpf_prog_free(fp);
 }
 
+typedef int (*bpf_aux_classic_check_t)(struct sock_filter *filter,
+				       unsigned int flen);
+
 int bpf_prog_create(struct bpf_prog **pfp, struct sock_fprog_kern *fprog);
+int bpf_prog_create_from_user(struct bpf_prog **pfp, struct sock_fprog *fprog,
+			      bpf_aux_classic_check_t trans);
 void bpf_prog_destroy(struct bpf_prog *fp);
 
 static inline unsigned int sk_filter_size(unsigned int proglen)
@@ -394,14 +399,7 @@ static inline unsigned int sk_filter_size(unsigned int proglen)
 int sk_attach_filter(struct sock_fprog *fprog, struct sock *sk);
 int sk_attach_bpf(u32 ufd, struct sock *sk);
 int sk_detach_filter(struct sock *sk);
-
-typedef int (*bpf_aux_classic_check_t)(struct sock_filter *filter,
-				       unsigned int flen);
-
 int bpf_check_classic(const struct sock_filter *filter, unsigned int flen);
-struct bpf_prog *bpf_prepare_filter(struct bpf_prog *fp,
-				    bpf_aux_classic_check_t trans);
-
 int sk_get_filter(struct sock *sk, struct sock_filter __user *filter,
 		  unsigned int len);
 
