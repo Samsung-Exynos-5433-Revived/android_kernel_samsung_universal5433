@@ -69,6 +69,9 @@ int sock_diag_put_filterinfo(struct user_namespace *user_ns, struct sock *sk,
 		goto out;
 
 	fprog = filter->prog->orig_prog;
+	if (!fprog)
+		goto out;
+
 	flen = bpf_classic_proglen(fprog);
 
 	attr = nla_reserve(skb, attrtype, flen);
