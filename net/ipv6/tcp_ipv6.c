@@ -1336,6 +1336,10 @@ static int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
 
 	if (sk_filter(sk, skb))
 		goto discard;
+#ifdef CONFIG_MPTCP
+	if (is_meta_sk(sk))
+		return mptcp_v6_do_rcv(sk, skb);
+#endif
 
 	/*
 	 *	socket locking is here for SMP purposes as backlog rcv
